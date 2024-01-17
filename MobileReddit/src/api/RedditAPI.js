@@ -1,39 +1,54 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authorize } from 'react-native-app-auth'
+import axios from 'axios';
 
-const config = {
-    redirectUrl: 'http://localhost:3000/callback',
-    clientId: 'uZn6VSguEYlIotyFcB3VEQ',
-    scopes: ['identity','read'],
-    serviceConfiguration: {
-        authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize',
-        tokenEndpoint: 'https://www.reddit.com/api/v1/access_token',
-    },
+const redditAxios = axios.create({
+  baseURL: 'https://oauth.reddit.com',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+});
+
+const fetchPopularSubreddits = async () => {
+  try {
+    const response = await axios.get('https://www.reddit.com/subreddits/popular.json');
+    const subreddits = response.data.data.children.map(subreddit => subreddit.data);
+    return subreddits;
+  } catch (error) {
+    console.error('error :', error);
+  }
 };
 
-const RedditAPI = {
-
-    auth: async () => {
-        try {
-            const result = await authorize(config);
-            console.log('token :', result);
-    
-            await AsyncStorage.setItem('accessToken', result.accessToken);
-        }
-        catch (error){
-            console.log('error :', error);
-        }
-    },
-    
-    getAccessToken: async () => {
-        try {
-            const accessToken = await AsyncStorage.getItem('accessToken');
-            return accessToken;
-        } catch (error) {
-            console.log(error);
-            return null;        
-        }
-    },
+const getSubscribedSubreddits = async (accessToken) => {
+  try {
+    const response = await redditAxios.get('/subreddits/mine/subscriber', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response.data.data.children.map(subreddit => subreddit.data);
+  } catch (error) {
+    console.error('error :', error);
+  }
 };
 
-export default RedditAPI;
+const joinSubreddit = async (accessToken, subredditId) => {
+  try {
+    const response = await redditAxios.post('/api/subscribe', {
+      action: 'sub',
+      sr: subredditId
+    }, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('error :', error);
+  }
+};
+
+const searchSubreddits = async (accessToken, query) => {
+  try {
+    const response = await redditAxios.get(`/subreddits/search?q=${encodeURIComponent(query)}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response.data.data.children.map(subreddit => subreddit.data);
+  } catch (error) {
+    console.error('error :', error);
+  }
+};
+
+export { fetchPopularSubreddits, getSubscribedSubreddits, joinSubreddit, searchSubreddits };
