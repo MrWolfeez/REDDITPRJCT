@@ -3,6 +3,10 @@
     "name": "MobileReddit",
     "slug": "MobileReddit",
     "version": "1.0.0",
+    "scheme": "MobileReddit",
+    "detach": {
+      "scheme": "exp..."
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
