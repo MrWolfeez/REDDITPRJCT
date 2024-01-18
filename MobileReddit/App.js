@@ -1,20 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import RedditAPI from './src/api/Auth';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { StyleSheet, Text, View } from 'react-native';
 import SubredditList from './src/components/SubredditList';
 import Navbar from './src/components/Navbar';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
+import WebView from 'react-native-webview';
+import { useState } from 'react';
 
 
 
 export default function App() {
-
-  const redditSignIn = async () => {
-   await RedditAPI.auth();
-  };
-
+  const [loggedIn, setLoggedIn] = useState(undefined)
+  if (loggedIn == undefined){
+  return (<WebView
+  onNavigationStateChange={(e) => console.log(e.url)}
+    source={{
+      uri: 'https://www.reddit.com/api/v1/authorize?client_id=uZn6VSguEYlIotyFcB3VEQ&response_type=code&state=cocomelon&redirect_uri=http://localhost:3000/callback&duration=temporary&scope=subscribe'
+    }}/>)
+  } else {
   return (
     <NavigationContainer>
       <View style={styles.container}>
@@ -22,12 +24,13 @@ export default function App() {
       <BottomTabNavigator />
       <View style={styles.content}>
         <Text>Reddit App</Text>
-        <TouchableOpacity onPress={redditSignIn}><Text>SignIn with Reddit</Text></TouchableOpacity>
+          
         <SubredditList />
       </View>
     </View>
     </NavigationContainer>
   );
+}
 }
 
 const styles = StyleSheet.create({
