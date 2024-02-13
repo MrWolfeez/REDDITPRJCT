@@ -1,0 +1,24 @@
+# .gitattributes
+
+# Linguist documentation
+*.md linguist-documentation
+
+# Linguist vendored - ignore dependencies directory
+node_modules/* linguist-vendored
+
+# Mark third-party styles as vendored
+**/third_party/**/*.css linguist-vendored
+**/vendor/**/*.css linguist-vendored
+
+# Mark batch scripts as vendored
+**/*.bat linguist-vendored
+
+# Exclude specific directories
+build/* linguist-vendored
+dist/* linguist-vendored
+
+# Consider all .js files as JavaScript, although it should already be the case
+*.js linguist-language=JavaScript
+
+# Consider .jsx files as JavaScript
+*.jsx linguist-language=JavaScript

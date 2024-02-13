@@ -1,4 +1,5 @@
 import axios from 'axios';
+import RedditAPI from './Auth';
 
 const redditAxios = axios.create({
   baseURL: 'https://oauth.reddit.com',
@@ -26,19 +27,36 @@ const getSubscribedSubreddits = async (accessToken) => {
   }
 };
 
-const joinSubreddit = async (accessToken, subredditId) => {
-  try {
-    const response = await redditAxios.post('/api/subscribe', {
-      action: 'sub',
-      sr: subredditId
-    }, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('error :', error);
+const joinSubreddit = async (subredditName) => {
+  const accessToken = await RedditAPI.getAccessToken();
+  if (!accessToken) {
+    console.log("No acces token available");
+    return;
   }
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `action=sub&sr_name=${subredditName}`,
+  };
+
+  fetch('https://oauth.reddit.com/api/subscribe', requestOptions)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        throw new Error(`Error joining subreddit: ${data.error}`);
+      }
+      console.log("Subscribed to subreddit successfully", data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
 };
+
+
 
 const searchSubreddits = async (accessToken, query) => {
   try {

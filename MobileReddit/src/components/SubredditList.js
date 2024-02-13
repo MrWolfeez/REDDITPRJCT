@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList } from 'react-native';
 import SubredditItem from '../components/SubredditItem';
+import { joinSubreddit } from '../api/RedditAPI';
 import { fetchPopularSubreddits } from '../api/RedditAPI';
 
 const SubredditListScreen = () => {
@@ -15,7 +16,13 @@ const SubredditListScreen = () => {
     loadSubreddits();
   }, []);
 
-  const handleJoinPress = (subreddit) => {
+  const handleJoinPress = async (subredditName) => {
+    try {
+      const result = await joinSubreddit(subredditName);
+      console.log(result);
+    } catch (error) {
+      console.error('Error joining subreddit:', error);
+    }
   };
 
   return (
